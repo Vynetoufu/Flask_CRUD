@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Student Management Dashboard</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            margin: 0;
+            padding: 30px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1000px;
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+        }
+
+        .card {
+            background-color: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+            padding: 25px;
+        }
+
+        h2,
+        h3 {
+            color: #2d3748;
+            margin-top: 0;
+            text-align: center;
+        }
+
+        /* Form Styling */
+        .student-form {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)) auto;
+            gap: 12px;
+            align-items: end;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-group label {
+            font-size: 12px;
+            font-weight: bold;
+            color: #4a5568;
+            margin-bottom: 4px;
+        }
+
+        input,
+        select {
+            padding: 9px;
+            border-radius: 6px;
+            border: 1px solid #cbd5e0;
+            font-size: 14px;
+        }
+
+        .btn-save {
+            background-color: #38a169;
+            color: white;
+            border: none;
+            padding: 10px 18px;
+            border-radius: 6px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .btn-save:hover {
+            background-color: #2f855a;
+        }
+
+        .btn-cancel {
+            background-color: #a0aec0;
+            color: white;
+            border: none;
+            padding: 10px 14px;
+            border-radius: 6px;
+            text-decoration: none;
+            font-weight: bold;
+            text-align: center;
+            display: inline-block;
+        }
+
+        /* Table Styling */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            overflow: hidden;
+            border-radius: 8px;
+            margin-top: 10px;
+        }
+
+        thead tr {
+            background-color: #2b6cb0;
+            color: #ffffff;
+            text-align: left;
+            font-weight: bold;
+        }
+
+        th,
+        td {
+            padding: 12px 14px;
+        }
+
+        .row-gray {
+            background-color: #e2e8f0;
+        }
+
+        .row-accent {
+            background-color: #ebf8ff;
+        }
+
+        tbody tr:hover {
+            background-color: #feebc8;
+            transition: background-color 0.2s ease;
+        }
+
+        /* Action Buttons Inside Table */
+        .btn-edit {
+            background-color: #3182ce;
+            color: white;
+            padding: 6px 12px;
+            border-radius: 4px;
+            text-decoration: none;
+            font-size: 13px;
+            font-weight: bold;
+        }
+
+        .btn-edit:hover {
+            background-color: #2b6cb0;
+        }
+
+        .btn-delete {
+            background-color: #e53e3e;
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: bold;
+        }
+
+        .btn-delete:hover {
+            background-color: #c53030;
+        }
+
+        .actions-cell {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .badge {
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-weight: bold;
+            color: white;
+        }
+
+        .badge-a {
+            background-color: #38a169;
+        }
+
+        .badge-b {
+            background-color: #3182ce;
+        }
+
+        .badge-c {
+            background-color: #dd6b20;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+
+        <!-- Dynamic Form Card (Handles both ADD and UPDATE) -->
+        <div class="card">
+            <h3>{% if student_to_edit %}✏️ Edit Student Record{% else %}➕ Add New Student{% endif %}</h3>
+            <form action="/" method="POST" class="student-form">
+
+                <!-- Hidden Field to pass primary key 'Id' when updating -->
+                {% if student_to_edit %}
+                <input type="hidden" name="action" value="update">
+                <input type="hidden" name="db_id" value="{{ student_to_edit.Id }}">
+                {% else %}
+                <input type="hidden" name="action" value="insert">
+                {% endif %}
+
+                <div class="form-group">
+                    <label>Student ID</label>
+                    <input type="text" name="Student_Id"
+                        value="{{ student_to_edit.Student_Id if student_to_edit else '' }}" placeholder="S001" required>
+                </div>
+                <div class="form-group">
+                    <label>Student Name</label>
+                    <input type="text" name="Student_Name"
+                        value="{{ student_to_edit.Student_Name if student_to_edit else '' }}" placeholder="Full Name"
+                        required>
+                </div>
+                <div class="form-group">
+                    <label>Major</label>
+                    <input type="text" name="Major" value="{{ student_to_edit.Major if student_to_edit else '' }}"
+                        placeholder="Major" required>
+                </div>
+                <div class="form-group">
+                    <label>Score</label>
+                    <input type="text" name="Score" value="{{ student_to_edit.Score if student_to_edit else '' }}"
+                        placeholder="85" required>
+                </div>
+                <div class="form-group">
+                    <label>Grade</label>
+                    <select name="Grade" required>
+                        <option value="A" {% if student_to_edit and student_to_edit.Grade=='A' %}selected{% endif %}>A
+                        </option>
+                        <option value="B" {% if student_to_edit and student_to_edit.Grade=='B' %}selected{% endif %}>B
+                        </option>
+                        <option value="C" {% if student_to_edit and student_to_edit.Grade=='C' %}selected{% endif %}>C
+                        </option>
+                        <option value="D" {% if student_to_edit and student_to_edit.Grade=='D' %}selected{% endif %}>D
+                        </option>
+                    </select>
+                </div>
+
+                <div style="display: flex; gap: 6px;">
+                    <button type="submit" class="btn-save">{% if student_to_edit %}Update{% else %}Save{% endif
+                        %}</button>
+                    {% if student_to_edit %}
+                    <a href="/" class="btn-cancel">Cancel</a>
+                    {% endif %}
+                </div>
+            </form>
+        </div>
+
+        <!-- Student Directory Table Card -->
+        <div class="card">
+            <h2>🎓 Student Performance Directory</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>DB Id</th>
+                        <th>Student ID</th>
+                        <th>Name</th>
+                        <th>Major</th>
+                        <th>Score</th>
+                        <th>Grade</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for student in student_list %}
+                    <tr class="{{ loop.cycle('row-gray', 'row-accent') }}">
+                        <td><strong>{{ student.Id }}</strong></td>
+                        <td>{{ student.Student_Id }}</td>
+                        <td>{{ student.Student_Name }}</td>
+                        <td>{{ student.Major }}</td>
+                        <td>{{ student.Score }}</td>
+                        <td>
+                            {% if student.Grade == 'A' %}
+                            <span class="badge badge-a">A</span>
+                            {% elif student.Grade == 'B' %}
+                            <span class="badge badge-b">B</span>
+                            {% else %}
+                            <span class="badge badge-c">{{ student.Grade }}</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <div class="actions-cell">
+                                <!-- Edit Button: Reloads page with ?edit_id=X to prefill form -->
+                                <a href="/?edit_id={{ student.Id }}" class="btn-edit">Edit</a>
+
+                                <!-- Delete Button: Posts to delete route using student's primary key 'Id' -->
+                                <form action="/delete/{{ student.Id }}" method="POST"
+                                    onsubmit="return confirm('Are you sure you want to delete {{ student.Student_Name }}?');"
+                                    style="margin: 0;">
+                                    <button type="submit" class="btn-delete">Delete</button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="7" style="text-align: center;">No students found in the database. Use the form
+                            above to add one!</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+    </div>
+
+</body>
+
+</html>

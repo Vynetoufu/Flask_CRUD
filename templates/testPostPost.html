@@ -1,0 +1,12 @@
+  <html>
+    <body>
+        <form method="POST" action="/">
+            <input type="text" name="text_input">
+            <input type="submit" value="Submit">
+        </form> 
+
+    {% if display_value %}
+        <h3>You submitted: {{ display_value }}</h3>
+    {% endif %}
+    </body>
+  </html>

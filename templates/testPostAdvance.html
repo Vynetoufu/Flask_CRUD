@@ -1,0 +1,75 @@
+<html>
+
+<body>
+    <style>
+        .btn-edit {
+            background-color: #3182ce;
+            color: white;
+            padding: 6px 12px;
+            border-radius: 4px;
+            text-decoration: none;
+            font-size: 13px;
+            font-weight: bold;
+        }
+
+        .btn-save {
+            background-color: #38a169;
+            color: white;
+            border: none;
+            padding: 10px 18px;
+            border-radius: 6px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .btn-save:hover {
+            background-color: #2f855a;
+        }
+
+        .btn-cancel {
+            background-color: #a0aec0;
+            color: white;
+            border: none;
+            padding: 10px 14px;
+            border-radius: 6px;
+            text-decoration: none;
+            font-weight: bold;
+            text-align: center;
+            display: inline-block;
+        }
+    </style>
+
+    <table>
+    </table>
+    <tr>
+        <td>
+            <form method="POST" action="/">
+                <input type="hidden" name="test_hidden_input">
+                <input type="hidden" name="hidden_id" value = "STD_002">
+                <input type="text" name="test_input">
+                <input type="submit" value="Submit">
+            </form>
+
+            {% if display_value %}
+            <h3>You submitted: {{ display_value }} for Id = {{student_to_edit}}</h3>
+            {% endif %}
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <div class="actions-cell">
+                <!-- Edit Button: Reloads page with ?edit_id=X to prefill form -->
+                <a href="/?edit_id=STD_001" class="btn-edit">Edit</a>
+
+                <!-- Delete Button: Posts to delete route using student's primary key 'Id' -->
+                <form action="/delete/STD_001" method="POST"
+                    onsubmit="return confirm('Are you sure you want to delete STD_001 ?');" style="margin: 0;">
+                    <button type="submit" class="btn-delete">Delete</button>
+                </form>
+            </div>
+        </td>
+    </tr>
+    </table>
+</body>
+
+</html>
